@@ -25,13 +25,14 @@ class Cryptgraphy:
             4.将数据进行AES, MODE_CBC模式加密
             5.件加密数据进行进行base64编码
         """
-        encoder = PKCS7Encoder(cls.AES_BLOCK_SIZE)
 
         randomNum = Cryptgraphy._create_randCode(cls.RANDOM_NUM_SIZE)  # 随机获取16位字符串
         msg_lengthInfo = Cryptgraphy._get_stringLength_toByte(unencrypted_data, cls.MSG_LENGTH_INFO_SIZE)  # 4位字符串（信息长度）
         input_info = bytes(unencrypted_data + suiteKey, 'ascii')  # 输入字符串+ suiteKey
         msg = randomNum + msg_lengthInfo + input_info
-        msg = encoder.encode(msg)  # 将数据进行  PKCS7 补位 128Bit
+        # msg = encoder.encode(msg)  # 将数据进行  PKCS7 补位 128Bit
+        pad = lambda s: s + (cls.AES_BLOCK_SIZE - len(s) % cls.AES_BLOCK_SIZE) * bytes(chr(cls.AES_BLOCK_SIZE - len(s) % cls.AES_BLOCK_SIZE), 'ascii')
+        msg = pad(msg)
 
         encodingAESKey = encodingAESKey + "="
         key = base64.b64decode(encodingAESKey.encode("utf-8"))
@@ -87,8 +88,11 @@ class Cryptgraphy:
         cipher.block_size = cls.AES_BLOCK_SIZE
 
         msg = cipher.decrypt(encrypt_data)
-        encoder = PKCS7Encoder(cls.AES_BLOCK_SIZE)
-        msg = encoder.decode(msg)
+        # encoder = PKCS7Encoder(cls.AES_BLOCK_SIZE)
+        # msg = encoder.decode(msg)
+        # pad = lambda s: s + (cls.AES_BLOCK_SIZE - len(s) % cls.AES_BLOCK_SIZE) * chr(cls.AES_BLOCK_SIZE - len(s) % cls.AES_BLOCK_SIZE)
+        unpad = lambda s: s[0:-s[-1]]
+        msg = unpad(msg)
         msg_start = cls.RANDOM_NUM_SIZE + cls.MSG_LENGTH_INFO_SIZE
         msg_length_info = msg[cls.RANDOM_NUM_SIZE:msg_start]
 
@@ -106,3 +110,7 @@ class Cryptgraphy:
         for i, value in enumerate(data[::-1]):
             num += pow(128, i) * value
         return num
+
+if __name__ == "__main__":
+    print(type(chr(1)))
+    print(type(b'w'))

@@ -132,8 +132,8 @@ if __name__ == "__main__":
     d = DingTalkCrypt(TOKEN, AES_KEY, KEY)
 
     s = 'dd'
-    for i in range(12342):
-        s += "i"
-    ret, encrypt, signature = d.encrypt_msg(s, timestamp, nonce)
+    # for i in range(12342):
+    #     s += "i"
+    # ret, encrypt, signature = d.encrypt_msg(s, timestamp, nonce)
     # print(ret, encrypt, signature)
     print(d.decrypt_msg(signature, timestamp, nonce, encrypt))
